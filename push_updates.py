@@ -2,7 +2,7 @@ import requests
 import psycopg2
 from psycopg2 import Error
 import json
-PERSON_MODEL_FIELDS = ('local_id', 'first_name', 'last_name', 'phone', 'image',)
+PRIMARY_PERSON_MODEL_FIELDS = ('local_id', 'first_name', 'last_name', 'phone', 'image',)
 
 
 def push():
@@ -18,7 +18,7 @@ def push():
         data = list()
         for record in cursor.fetchall():
             person_data = dict()
-            for idx, val in enumerate(PERSON_MODEL_FIELDS):
+            for idx, val in enumerate(PRIMARY_PERSON_MODEL_FIELDS):
                 if record[idx] is not None:
                     person_data[val] = record[idx]
             data.append(person_data)
@@ -27,7 +27,7 @@ def push():
         if response.status_code == 200:
             for item in json.loads(response.text):
                 try:
-                    query = str("""UPDATE persons SET primary_id = {0} WHERE id = {1};""").format(item['id'], item['local_id'])
+                    query = str("""UPDATE persons SET primary_id = '{0}' WHERE id = '{1}';""").format(item['id'], item['local_id'])
                     cursor.execute(query)
                     connection.commit()
                     cursor.close()
