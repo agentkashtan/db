@@ -12,3 +12,8 @@ class ReadOnlyDB(models.Model):
     title = models.CharField(max_length=200, blank=True, null=True)
     key = models.CharField(max_length=200, blank=False, null=False, unique=True)
     person = models.ManyToManyField('Person', related_name='db', null=True, blank=True)
+
+
+class UnconfirmedTransaction(models.Model):
+    db = models.ForeignKey('ReadOnlyDB', related_name='transaction', null=False, blank=False, on_delete=models.CASCADE)
+    person = models.ManyToManyField('Person', related_name='transaction', null=True, blank=True)

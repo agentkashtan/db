@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Person, ReadOnlyDB
+from .models import Person, ReadOnlyDB, UnconfirmedTransaction
 
 
 class PersonAdmin(admin.ModelAdmin):
@@ -14,6 +14,13 @@ class ReadOnlyDBAdmin(admin.ModelAdmin):
     fields = ('key', 'title', 'person',)
 
 
+class UnconfirmedTransactionAdmin(admin.ModelAdmin):
+    model = UnconfirmedTransaction
+    list_display = ('id',)
+    fields = ('db', 'person',)
+
+
+admin.site.register(UnconfirmedTransaction, UnconfirmedTransactionAdmin)
 admin.site.register(ReadOnlyDB, ReadOnlyDBAdmin)
 admin.site.register(Person, PersonAdmin)
 
