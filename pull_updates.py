@@ -20,7 +20,7 @@ def pull(db_key):
                                                   password="123",
                                                   host="127.0.0.1",
                                                   port="5432",
-                                                  database="pull")
+                                                  database="db_to_read")
 
                     cursor = connection.cursor()
                     cursor.execute(str("""SELECT id FROM persons WHERE primary_id='{0}';""").format(item['id']))
@@ -58,7 +58,7 @@ def pull(db_key):
                                                   password="123",
                                                   host="127.0.0.1",
                                                   port="5432",
-                                                  database="pull")
+                                                  database="db_to_read")
 
                     cursor = connection.cursor()
                     cursor.execute(str("""DELETE FROM persons WHERE primary_id='{0}';""").format(item['primary_id']))
@@ -79,4 +79,4 @@ def pull(db_key):
 
 
 if __name__ == '__main__':
-    pull('123')
+    pull('228')

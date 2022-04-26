@@ -11,6 +11,11 @@ class Person(models.Model):
     phone = models.CharField(max_length=20, blank=True, null=True)
     image = models.ImageField(null=True, blank=True)
 
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        for db in self.db.all():
+            self.db.remove(db)
+        return super(Person, self).save()
+
     def delete(self, using=None, keep_parents=False):
         PersonToDelete.objects.get_or_create(primary_id=self.id)
         return super(Person, self).delete()

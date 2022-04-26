@@ -11,7 +11,7 @@ def push():
                                       password="123",
                                       host="127.0.0.1",
                                       port="5432",
-                                      database="test")
+                                      database="source")
 
         cursor = connection.cursor()
         cursor.execute("SELECT * FROM persons WHERE is_sync is FALSE ;")
@@ -41,7 +41,7 @@ def push():
                                               password="123",
                                               host="127.0.0.1",
                                               port="5432",
-                                              database="test")
+                                              database="source")
 
                 cursor = connection.cursor()
 
