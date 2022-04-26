@@ -4,11 +4,12 @@ from psycopg2 import Error
 import json
 
 LOCAL_PERSON_MODEL_FIELDS = ('first_name', 'last_name', 'phone', 'image', 'primary_id')
+url = 'http://ec2-18-117-231-98.us-east-2.compute.amazonaws.com:8000'
 
 
 def pull(db_key):
     payload = {'key': db_key}
-    response = requests.get("http://127.0.0.1:8000/api/data/pull", params=payload)
+    response = requests.get(f"{url}/api/data/pull", params=payload)
 
     if response.status_code == 200:
         added_ids = list()
@@ -72,7 +73,7 @@ def pull(db_key):
                 pass
 
         header = {'content-type': 'application/json'}
-        requests.post("http://127.0.0.1:8000/api/data/confirm-pull/", data=json.dumps({"data_added": added_ids,
+        requests.post(f"{url}/api/data/confirm-pull/", data=json.dumps({"data_added": added_ids,
                                                                                        "data_deleted": deleted_ids,
                                                                                        "key": db_key}),
                       headers=header)

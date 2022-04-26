@@ -9,6 +9,7 @@ environ==1.0
 idna==3.3
 Pillow==9.1.0
 psycopg2==2.9.3
+psycopg2-binary==2.9.3
 pytz==2022.1
 requests==2.27.1
 sqlparse==0.4.2

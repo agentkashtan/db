@@ -2,13 +2,15 @@ import requests
 import psycopg2
 from psycopg2 import Error
 import json
+
 PRIMARY_PERSON_MODEL_FIELDS = ('local_id', 'first_name', 'last_name', 'phone', 'image', 'primary_id',)
+url = 'http://ec2-18-117-231-98.us-east-2.compute.amazonaws.com:8000'
 
 
 def push():
     try:
         connection = psycopg2.connect(user="postgres",
-                                      password="123",
+                                      password="1",
                                       host="127.0.0.1",
                                       port="5432",
                                       database="source")
@@ -26,7 +28,7 @@ def push():
                 person_data[val] = record[idx]
         data.append(person_data)
     header = {'content-type': 'application/json'}
-    response = requests.post("http://127.0.0.1:8000/api/data/push/", data=json.dumps({"data": data}), headers=header)
+    response = requests.post(f"{url}/api/data/push/", data=json.dumps({"data": data}), headers=header)
     if response.status_code == 200:
         for item in json.loads(response.text):
             try:
@@ -38,7 +40,7 @@ def push():
             except Exception as error:
                 print(error)
                 connection = psycopg2.connect(user="postgres",
-                                              password="123",
+                                              password="1",
                                               host="127.0.0.1",
                                               port="5432",
                                               database="source")
