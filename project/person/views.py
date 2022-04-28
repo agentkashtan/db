@@ -1,12 +1,19 @@
 from django.shortcuts import render
+from django.http import HttpResponse
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from .serializers import PersonSerializer, PersonUpdateSerializer, PersonDeleteSerializer
+from .serializers import PersonSerializer, PersonUpdateSerializer, PersonDeleteSerializer, PersonListSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .models import Person, ReadOnlyDB, UnconfirmedTransaction, PersonToDelete
 from rest_framework.generics import get_object_or_404
 from django.db.models import Q
+import base64
+from PIL import Image
+import io
+from io import BytesIO
+from django.core.files import File
+import json
 
 
 class UpdateDataViewSet(viewsets.ViewSet):
@@ -30,10 +37,10 @@ class UpdateDataViewSet(viewsets.ViewSet):
             transaction.person_to_delete.add(person)
 
         transaction.save()
-        data = {"add": PersonSerializer(data_to_add, many=True).data,
-                "delete": PersonDeleteSerializer(data_to_delete, many=True).data}
-        print(data)
-        return Response(data)
+
+        data = PersonListSerializer(data_to_add, many=True).data
+        return HttpResponse(json.dumps({"add": data,
+                            "delete": PersonDeleteSerializer(data_to_delete, many=True).data}))
 
     @action(methods=['post'], detail=False, permission_classes=[AllowAny], url_path='push')
     def push_updates(self, request):
@@ -42,11 +49,14 @@ class UpdateDataViewSet(viewsets.ViewSet):
             try:
                 token = val['local_id']
                 primary_id = val.get('primary_id', None)
+                from django.core.files.base import ContentFile
+
                 if primary_id is not None and Person.objects.filter(id=primary_id).exists():
                     person = Person.objects.get(id=primary_id)
                     serializer = PersonUpdateSerializer(person, data=val, partial=True)
                     serializer.is_valid(raise_exception=True)
-                    person_data = PersonSerializer(serializer.save()).data
+                    person = serializer.save()
+
                     for db in person.db.all():
                         person.db.remove(db)
 
@@ -56,10 +66,18 @@ class UpdateDataViewSet(viewsets.ViewSet):
                 else:
                     serializer = PersonSerializer(data=val)
                     serializer.is_valid(raise_exception=True)
-                    person_data = PersonSerializer(serializer.save()).data
+                    person = serializer.save()
+
+                image = Image.open(io.BytesIO(base64.b64decode(val['image'].encode('utf-8'))))
+                blob = BytesIO()
+                image.save(blob, image.format.lower())
+                person.image.save(f'{person.first_name}_{person.last_name}.{image.format.lower()}', File(blob),
+                                  save=True)
+
+                person_data = PersonSerializer(person).data
                 person_data['local_id'] = token
                 response.append(person_data)
-            except KeyError:
+            except:
                 pass
 
         return Response(response)

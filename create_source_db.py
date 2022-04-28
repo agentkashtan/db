@@ -15,6 +15,6 @@ conn = psycopg2.connect(
 conn.autocommit = True
 cursor = conn.cursor()
 
-cursor.execute('''CREATE TABLE persons (id serial PRIMARY KEY, first_name VARCHAR ( 50 ) , last_name VARCHAR ( 50 ), phone VARCHAR ( 50 ), image VARCHAR(50), primary_id integer UNIQUE, is_sync BOOLEAN NOT NULL DEFAULT FALSE);''')
+cursor.execute('''CREATE TABLE persons (id serial PRIMARY KEY, first_name VARCHAR ( 50 ) , last_name VARCHAR ( 50 ), phone VARCHAR ( 50 ), primary_id integer UNIQUE, is_sync BOOLEAN NOT NULL DEFAULT FALSE, image VARCHAR(200));''')
 print('added table to source database')
 conn.close()

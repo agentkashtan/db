@@ -2,9 +2,13 @@ import requests
 import psycopg2
 from psycopg2 import Error
 import json
+import base64
+import os
+script_dir = os.path.dirname(__file__)
 
-PRIMARY_PERSON_MODEL_FIELDS = ('local_id', 'first_name', 'last_name', 'phone', 'image', 'primary_id',)
-url = 'http://ec2-18-117-231-98.us-east-2.compute.amazonaws.com:8000'
+PRIMARY_PERSON_MODEL_FIELDS = ('local_id', 'first_name', 'last_name', 'phone', 'primary_id', )
+#url = 'http://ec2-18-117-231-98.us-east-2.compute.amazonaws.com:8000'
+url = 'http://127.0.0.1:8000'
 
 
 def push():
@@ -26,9 +30,14 @@ def push():
         for idx, val in enumerate(PRIMARY_PERSON_MODEL_FIELDS):
             if record[idx] is not None:
                 person_data[val] = record[idx]
+
+        with open(os.path.join(script_dir, record[6]), "rb") as f:
+            im_bytes = f.read()
+        person_data['image'] = base64.b64encode(im_bytes).decode("utf8")
         data.append(person_data)
     header = {'content-type': 'application/json'}
     response = requests.post(f"{url}/api/data/push/", data=json.dumps({"data": data}), headers=header)
+
     if response.status_code == 200:
         for item in json.loads(response.text):
             try:

@@ -2,9 +2,16 @@ import requests
 import psycopg2
 from psycopg2 import Error
 import json
+import base64
+from PIL import Image
+import io
+from io import BytesIO
+from django.core.files import File
+
 
 LOCAL_PERSON_MODEL_FIELDS = ('first_name', 'last_name', 'phone', 'image', 'primary_id')
-url = 'http://ec2-18-117-231-98.us-east-2.compute.amazonaws.com:8000'
+#url = 'http://ec2-18-117-231-98.us-east-2.compute.amazonaws.com:8000'
+url = 'http://127.0.0.1:8000'
 
 
 def pull(db_key):
@@ -15,6 +22,13 @@ def pull(db_key):
         added_ids = list()
 
         for item in json.loads(response.text)['add']:
+            if item['image_file'] is not None:
+                image = Image.open(io.BytesIO(base64.b64decode(item['image_file'].encode('utf-8'))))
+                image_name = f"final_images/{item['first_name']}_{item['last_name']}.{image.format.lower()}"
+                image.save(image_name)
+                item['image'] = image_name
+            else:
+                item['image'] = None
             try:
                 try:
                     connection = psycopg2.connect(user="postgres",

@@ -2,7 +2,7 @@ import psycopg2
 from psycopg2 import Error
 
 
-def add_to_db(first_name, last_name, phone):
+def add_to_db(first_name, last_name, phone, image):
     try:
         connection = psycopg2.connect(user="postgres",
                                       password="123",
@@ -12,7 +12,10 @@ def add_to_db(first_name, last_name, phone):
 
         cursor = connection.cursor()
         query = str(
-                """INSERT INTO persons (first_name, last_name, phone) VALUES ('{0}', '{1}', '{2}');""").format(first_name, last_name, phone)
+                """INSERT INTO persons (first_name, last_name, phone, image) VALUES ('{0}', '{1}', '{2}', '{3}');""").format(first_name,
+                                                                                                                             last_name,
+                                                                                                                             phone,
+                                                                                                                             image)
 
         cursor.execute(query)
         connection.commit()
@@ -27,5 +30,7 @@ if __name__ == '__main__':
     last_name = input()
     print('Enter your phone:')
     phone = input()
-    add_to_db(name, last_name, phone)
+    print('Enter image path:')
+    image = input()
+    add_to_db(name, last_name, phone, image)
     print('added to db')
